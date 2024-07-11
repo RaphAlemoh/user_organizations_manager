@@ -58,7 +58,7 @@ class OrganizationController extends Controller
 
         $organization = Organization::create([
             'orgId' => uniqid(),
-            'name' => $validated['name'],
+            'name' => $user->firstName . "'s " . $validated['name'],
             'description' => $validated['description'] ?? null,
         ]);
 
@@ -134,7 +134,19 @@ class OrganizationController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
+
         $user = User::where('userId', $validated['userId'])->first();
+
+        $organization = $user->organizations()->where('orgId', $orgId)->first();
+
+        if (!$organization) {
+            return $this->jsonReponse([
+                'status' => 'error',
+                'message' => 'User is already in this organization',
+                'data' => null
+            ], Response::HTTP_NOT_FOUND);
+        }
+
         if ($user) {
             $user->organizations()->attach($organization);
             return $this->jsonReponse([

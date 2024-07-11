@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Response;
 
 class StoreOrganizationRequest extends FormRequest
 {
@@ -34,9 +35,19 @@ class StoreOrganizationRequest extends FormRequest
     {
         $errors = (new ValidationException($validator))->errors();
 
+        $formattedError = [];
+
+        foreach ($errors as $field => $messages) {
+            foreach ($messages as $message) {
+                $formattedError[] = [
+                    "field" => $field,
+                    "message" => $message
+                ];
+            }
+        }
+
         throw new HttpResponseException(response()->json([
-            'errors' => $errors,
-            'message' => "An error occured with the fields"
-        ], 422));
+            'errors' => $formattedError,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 }

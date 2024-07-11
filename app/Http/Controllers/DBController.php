@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
 class DBController extends Controller
@@ -13,6 +12,9 @@ class DBController extends Controller
         Artisan::call('migrate:fresh', [
             '--force' => true
         ]);
+
+        Artisan::call('db:seed');
+
         return Artisan::output();
     }
 }

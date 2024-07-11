@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Response;
 
 class RegisterRequest extends FormRequest
 {
@@ -28,7 +29,7 @@ class RegisterRequest extends FormRequest
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
             'phone' => 'nullable|string|max:15',
         ];
     }
@@ -37,9 +38,19 @@ class RegisterRequest extends FormRequest
     {
         $errors = (new ValidationException($validator))->errors();
 
+        $formattedError = [];
+
+        foreach ($errors as $field => $messages) {
+            foreach ($messages as $message) {
+                $formattedError[] = [
+                    "field" => $field,
+                    "message" => $message
+                ];
+            }
+        }
+
         throw new HttpResponseException(response()->json([
-            'errors' => $errors,
-            'message' => "An error occured with the fields"
-        ], 422));
+            'errors' => $formattedError,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 }

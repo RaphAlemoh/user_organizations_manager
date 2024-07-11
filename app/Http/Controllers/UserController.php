@@ -37,9 +37,17 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $userId)
     {
-        $user = User::where('id', $id)->firstOrFail();
+        $user = User::where('userId', $userId)->first();
+
+        if (!$user) {
+            return $this->jsonReponse([
+                'status' => 'error',
+                'message' => 'User not found',
+                'data' => null
+            ], Response::HTTP_NOT_FOUND);
+        }
 
         return $this->jsonReponse([
             'status' => 'success',

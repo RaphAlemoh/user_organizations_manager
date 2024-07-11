@@ -23,7 +23,6 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-
         $user = User::create([
             'userId' => uniqid(),
             'firstName' => $validated['firstName'],
@@ -70,12 +69,12 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        if (!Auth::attempt($validated)) {
+        if (!JWTAuth::attempt($validated)) {
             return $this->jsonReponse([
-                'status' => "Bad request",
+                'status' => "Incorrect credentials",
                 "message" => "Authentication failed",
                 "statusCode" => Response::HTTP_UNAUTHORIZED
-            ]);
+            ], Response::HTTP_UNAUTHORIZED);
         }
         $user = User::query()
             ->where('email', $validated['email'])
@@ -84,7 +83,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
         return $this->jsonReponse([
             'status' => 'success',
-            'message' => 'Registration successful',
+            'message' => 'Login successful',
             'data' => [
                 'accessToken' => $token,
                 'user' => [

@@ -35,9 +35,19 @@ class LoginRequest extends FormRequest
     {
         $errors = (new ValidationException($validator))->errors();
 
+        $formattedError = [];
+
+        foreach ($errors as $field => $messages) {
+            foreach ($messages as $message) {
+                $formattedError[] = [
+                    "field" => $field,
+                    "message" => $message
+                ];
+            }
+        }
+
         throw new HttpResponseException(response()->json([
-            'errors' => $errors,
-            'message' => "An error occured with the fields"
+            'errors' => $formattedError,
         ], Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 }
